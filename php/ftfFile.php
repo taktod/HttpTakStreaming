@@ -11,7 +11,7 @@
  */
 /** config */
 $httpRoot = "http://localhost/";
-$fileRoot = "/var/html/documentRoot/";
+$fileRoot = "/Users/todatakahiko/Sites/hts/";
 $interval = 3000;
 
 /** input data */
@@ -27,18 +27,19 @@ $id = filemtime($fthFile);
 $files = scandir(dirname($ftmFile));
 $filetime = 0;
 foreach($files as $file) {
-	$fullPath = dirname($ftmFile) . $file;
-	if(preg_match("/{$streamPath}_(\d+)\.ftm$/", $fullPath, $matches) || filemtime($fullPath) > $filetime) {
+	$fullPath = dirname($ftmFile) . "/" . $file;
+	if(preg_match("/" . basename($streamPath) . "_([\d]+)\.ftm$/", $fullPath, $matches) && filemtime($fullPath) > $filetime) {
 		$time = filemtime($fullPath);
-		$num = matches[1];
+		$num = $matches[1];
 	}
 }
+$age = time() - $time;
 
 echo <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <httpTakStreaming>
 	<packetInterval>{$interval}</packetInterval>
 	<flvTakHeader id="{$id}">{$fthFile}</flvTakHeader>
-	<flvTakMedia start="{$num}">{$ftmFile}</flvTakMedia>
+	<flvTakMedia start="{$num}" age="{$age}">{$ftmFile}</flvTakMedia>
 </httpTakStreaming>
 XML;
