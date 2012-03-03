@@ -29,6 +29,7 @@ public class ApplicationAdapterEx extends ApplicationAdapter {
 	 * @param path
 	 */
 	public void setOutputPath(String path) {
+		System.out.println(path);
 		logger.info(path);
 		outputPath = path;
 	}
@@ -37,6 +38,7 @@ public class ApplicationAdapterEx extends ApplicationAdapter {
 	 * @param interval
 	 */
 	public void setInterval(int interval) {
+		System.out.println(interval);
 		logger.info("" + interval);
 		this.interval = interval;
 	}
@@ -45,6 +47,7 @@ public class ApplicationAdapterEx extends ApplicationAdapter {
 	 * @param path
 	 */
 	public void setTmpPath(String path) {
+		System.out.println(path);
 		logger.info(path);
 		tmpPath = path;
 	}

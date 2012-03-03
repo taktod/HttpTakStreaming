@@ -137,6 +137,7 @@ public class FlvByteCreator implements IStreamListener {
 		flvHeader.setFlagAudio(audioCodecId != -1);
 		flvHeader.setFlagVideo(videoCodecId != -1);
 		IoBuffer header = IoBuffer.allocate(HEADER_LENDTH + 4);
+		System.out.println(header.toString());
 		flvHeader.write(header);
 		if(header.hasArray()) {
 			header.flip();
