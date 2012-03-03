@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Script>
+		<![CDATA[
+			import com.ttProject.media.HtsVideo;
+			import com.ttProject.net.HtsStream;
+			private var htsStream:HtsStream;
+			private var htsVideo:HtsVideo;
+			protected function play(event:MouseEvent):void {
+				htsStream = new HtsStream;
+				htsStream.bufferTime = 0;
+				htsVideo = new HtsVideo;
+				htsVideo.attachHtsStream(htsStream);
+				uiComp.addChild(htsVideo);
+				htsStream.play(address.text);
+			}
+		]]>
+	</fx:Script>
+	<mx:Canvas>
+		<mx:UIComponent id="uiComp" />
+	</mx:Canvas>
+	<s:TextInput  x="48" y="268" width="184" id="address"/>
+	<s:Button  x="240" y="267" label="play" click="play(event)"/>
+	<s:Label x="10" y="269" text="hts" width="30" height="21" fontSize="20"/>
+</s:Application>
