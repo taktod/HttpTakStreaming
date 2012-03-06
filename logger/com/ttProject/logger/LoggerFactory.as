@@ -7,6 +7,7 @@ package com.ttProject.logger
 {
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
+	import flash.system.System;
 	import flash.utils.Timer;
 	
 	import mx.rpc.events.FaultEvent;
@@ -31,7 +32,7 @@ package com.ttProject.logger
 			LoggerFactory.level = level;
 			LoggerFactory.targetUrl = targetUrl;
 			if(targetUrl != null) {
-				timer = new Timer(300000); // send log data each 5min.
+				timer = new Timer(30000); // send log data each 5min.
 				timer.addEventListener(TimerEvent.TIMER, registerData);
 				timer.start();
 			}
@@ -49,6 +50,7 @@ package com.ttProject.logger
 			service.method = "POST";
 			service.send({task: "registerLog", data: logdata.join("\n")});
 			logdata = new Array();
+			ExternalInterface.call("console.log", "memory:" + System.totalMemory);
 		}
 	}
 }

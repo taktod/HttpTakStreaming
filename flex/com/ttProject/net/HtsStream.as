@@ -24,6 +24,7 @@ package com.ttProject.net
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
+	import flash.system.System;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	import flash.utils.clearInterval;
@@ -70,6 +71,8 @@ package com.ttProject.net
 		 */
 		public function play(htsUrl:String):void
 		{
+			logger.info("playを開始する。");
+			logger.info(htsUrl);
 			this.ftfFile = htsUrl;
 			// download xml dataa from ftfFile url
 			// ftfをダウンロードする。
@@ -83,6 +86,8 @@ package com.ttProject.net
 			super.close();
 		}
 		private function onFileLoad(data:XML):void {
+			logger.info("ftfファイルを読み込んだ");
+			logger.info(data);
 			var idChangeFlg:Boolean = false;
 			// xml tags...
 			var base:String = "httpTakStreaming".toLowerCase();
@@ -91,6 +96,7 @@ package com.ttProject.net
 			var media:String = "flvTakMedia".toLowerCase();
 			// check the base tag
 			if(data.name().localName.toLowerCase() != base) {
+				logger.error("baseがおかしい。");
 				return;
 			}
 			ftmArray = new Array();
@@ -137,8 +143,10 @@ package com.ttProject.net
 			}
 		}
 		private function onLoadedFthData(byteArray:ByteArray):void {
+			logger.info("fthファイルを読み込んだ");
 			// get fth data before finish flvStream setting up.
 			if(!setup()) {
+				logger.error("初期化に失敗した。");
 				// must try after flvStream setting up.
 				dispatchEvent(new HtsEvent(HtsEvent.HTS_EVENT, false, false, {code:"FthFile.Download.beforeSetup"}));
 				return;
@@ -150,6 +158,7 @@ package com.ttProject.net
 			downloadFtmData();
 		}
 		private function onLoadedData(byteArray:ByteArray):void {
+			logger.info("ftmファイルを読み込んだ");
 			// at this point shift up the ftm list
 			ftmData(byteArray);
 			var data:* = ftmArray.shift();
@@ -161,7 +170,7 @@ package com.ttProject.net
 				ftmArray.unshift(data);
 				// ここでは、ageに従ってしばらくまってから、ftfファイルを読み込み直す。
 				var timeout:int = packetInterval - parseInt(data.age) * 1000; // 秒で設定されているので、ミリ秒に変更して設定する。
-				setTimeout(onTimerEvent, timeout);
+				setTimeout(downloadFtfData, timeout);
 			}
 			else {
 				// VOD用
@@ -169,11 +178,13 @@ package com.ttProject.net
 			}
 		}
 		private function downloadFtmData():void {
+			logger.info("ftmデータをダウンロードしたいとおもいます。");
 			// get the targegt ftm file
 			var data:* = ftmArray[0];
 			if(data is String) {
 				if(lastFtmFile == data) {
-					setTimeout(onTimerEvent, 500); // 0.5秒後に再度やりなおす。
+					// ftmデータの設定が前にダウンロードしたデータと同じだった・・・すでにダウンロード済み
+					setTimeout(downloadFtfData, 500); // 0.5秒後に再度やりなおす。
 					return;
 				}
 				downloadData(data, onLoadedData);
@@ -183,16 +194,20 @@ package com.ttProject.net
 				var target:String = data.data;
 				target = target.replace(/\*/i, index);
 				if(lastFtmFile == target) {
-					// 現在もっているデータのlivetimeから待つべき時間を計算する。
+					logger.info("targetがすでにダウンロード済み:" + target);
+					// ftmデータの設定が前にダウンロードしたデータと同じだった・・・すでにダウンロード済み
 					var timeout:int = packetInterval - parseInt(data.age) * 1000;
-					setTimeout(onTimerEvent, timeout); // 0.5秒後に再度やりなおす。
+					logger.info("しばらく待ちます。:" + timeout);
+					setTimeout(downloadFtfData, timeout); // 0.5秒後に再度やりなおす。
 					return;
 				}
+				logger.info("問題ないので、ダウンロードを実行します。");
 				lastFtmFile = target;
 				downloadData(target, onLoadedData);
 			}
 		}
-		private function onTimerEvent():void {
+		private function downloadFtfData():void {
+			logger.info("ftfファイルをダウンロードしたいとおもいます。");
 			// ftfをダウンロードする。
 			downloadXml(ftfFile, onFileLoad);
 		}
@@ -204,6 +219,7 @@ package com.ttProject.net
 					task(data);
 				}
 				catch(e:Error) {
+					logger.error("CompleteError:");
 					logger.error(e);
 				}
 			});
@@ -220,6 +236,7 @@ package com.ttProject.net
 				loader.load(request);
 			}
 			catch(e:Error) {
+				logger.error("downloadXmlError:");
 				logger.error(e);
 			}
 		}
@@ -245,6 +262,7 @@ package com.ttProject.net
 				loader.load(request);
 			}
 			catch(e:Error) {
+				logger.error("downloadDataError:");
 				logger.error(e);
 			}
 		}
