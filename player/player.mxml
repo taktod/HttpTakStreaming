@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" height="355" width="497" viewSourceURL="srcview/index.html">
 	<fx:Script>
 		<![CDATA[
 			import com.ttProject.media.HtsVideo;
 			import com.ttProject.net.HtsStream;
-			private var htsStream:HtsStream;
-			private var htsVideo:HtsVideo;
+			private var htsStream:HtsStream = null;
+			private var htsVideo:HtsVideo = null;
 			protected function play(event:MouseEvent):void {
+				if(htsStream != null) {
+					htsStream.close();
+				}
+				if(htsVideo != null) {
+					htsVideo.clear();
+				}
+				// はじめる前にGCを強制しておく。(念のため)
+				System.gc();
 				htsStream = new HtsStream;
 				htsStream.bufferTime = 0;
 				htsVideo = new HtsVideo;
@@ -21,7 +29,7 @@
 	<mx:Canvas>
 		<mx:UIComponent id="uiComp" />
 	</mx:Canvas>
-	<s:TextInput  x="48" y="268" width="184" id="address"/>
-	<s:Button  x="240" y="267" label="play" click="play(event)"/>
-	<s:Label x="10" y="269" text="hts" width="30" height="21" fontSize="20"/>
+	<s:TextInput  x="48" y="323" width="361" id="address" text="http://49.212.39.17/hts?path=/default/hts/livestream"/>
+	<s:Button  x="417" y="324" label="play" click="play(event)"/>
+	<s:Label x="10" y="323" text="hts" width="30" height="21" fontSize="20"/>
 </s:Application>
