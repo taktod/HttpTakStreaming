@@ -212,7 +212,9 @@ package com.ttProject.net
 					// ftmデータの設定が前にダウンロードしたデータと同じだった・・・すでにダウンロード済み
 					var timeout:int = packetInterval - parseInt(data.age) * 1000;
 					if(timeout <= 0) {
-						timeout = 200;
+						logger.info("いますぐアクセスします。:" + timeout);
+						downloadFtfData(null);
+						return;
 					}
 					logger.info("しばらく待ちます。:" + timeout);
 //					setTimeout(downloadFtfData, timeout); // 0.5秒後に再度やりなおす。
