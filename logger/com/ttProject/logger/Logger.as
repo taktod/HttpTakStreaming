@@ -80,7 +80,7 @@ package com.ttProject.logger
 				line += dump(data, "	");
 			}
 			LoggerFactory.logdata.push(line);
-//			ExternalInterface.call("console.log", line);
+			ExternalInterface.call("console.log", line);
 		}
 		private function dump(data:Object, tab:String):String {
 			var result:Array = new Array();

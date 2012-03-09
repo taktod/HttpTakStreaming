@@ -53,6 +53,7 @@ package com.ttProject.net
 		/** fthファイルのID番号、この値が更新された場合は再度fthファイルを読み込む必要あり。 */
 		private var fthId:String; // id for fthFile
 		private var lastFtmFile:String;
+		private var lastFtmIndex:int;
 		/**
 		 * constructor
 		 */
@@ -64,6 +65,7 @@ package com.ttProject.net
 			ftmArray = new Array();
 			packetInterval = -1;
 			timerId = 0;
+			lastFtmIndex = 0;
 			super();
 		}
 		/**
@@ -187,6 +189,12 @@ package com.ttProject.net
 				timer.start();
 			}
 		}
+		private function onLoadedTransData(byteArray:ByteArray):void {
+			logger.info("ftm中間ファイルを読み込んだ");
+			ftmData(byteArray);
+			// 次のファイルを読み込む
+			downloadFtmData(null);
+		}
 		private function downloadFtmData(event:TimerEvent):void {
 			logger.info("ftmデータをダウンロードしたいとおもいます。");
 			// get the targegt ftm file
@@ -207,6 +215,16 @@ package com.ttProject.net
 				var index:int = data.start;
 				var target:String = data.data;
 				target = target.replace(/\*/i, index);
+				if(lastFtmIndex != 0 && lastFtmIndex + 1 != index) {
+					logger.info("中間ファイルなのですぐにダウンロードします。");
+					// 中間ファイルの場合、ダウンロードして、incrementします。
+					// 中間ファイルを作成する。
+					lastFtmIndex ++;
+					target = target.replace(/\*/i, lastFtmIndex);
+					lastFtmFile = target;
+					downloadData(target, onLoadedTransData);
+					return;
+				}
 				if(lastFtmFile == target) {
 					logger.info("targetがすでにダウンロード済み:" + target);
 					// ftmデータの設定が前にダウンロードしたデータと同じだった・・・すでにダウンロード済み
@@ -223,6 +241,7 @@ package com.ttProject.net
 					timer.start();
 					return;
 				}
+				lastFtmIndex = index;
 				logger.info("問題ないので、ダウンロードを実行します。");
 				lastFtmFile = target;
 				downloadData(target, onLoadedData);
